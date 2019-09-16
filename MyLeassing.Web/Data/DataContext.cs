@@ -1,13 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using MyLeassing.Web.Data.Entities;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace MyLeassing.Web.Data
 {
-    public class DataContext:DbContext
+    public class DataContext: IdentityDbContext<User>
+
     {
         public DataContext(DbContextOptions<DataContext> options):base(options)
         {
@@ -16,6 +14,8 @@ namespace MyLeassing.Web.Data
         public DbSet<Contract> Contracts { get; set; }
 
         public DbSet<Lessee> Lessees { get; set; }
+
+        public DbSet<Manager> Managers { get; set; }
 
         public DbSet<Owner> Owners { get; set; }
 

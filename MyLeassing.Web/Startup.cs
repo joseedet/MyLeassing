@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MyLeassing.Web.Data;
+using MyLeassing.Web.Helpers;
 
 namespace MyLeassing.Web
 {
@@ -39,7 +40,10 @@ namespace MyLeassing.Web
                 cfg.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"));
             });
 
+            //Se ejecuta una sola vez.
             services.AddTransient<SeedDb>();
+            services.AddScoped<IUserHelper, UserHelper>();//Se inyecta cada vez que lo necesita y crea un nuevo objeto.
+
 
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
