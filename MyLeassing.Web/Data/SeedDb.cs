@@ -24,9 +24,9 @@ namespace MyLeasing.Web.Data
         {
             await _context.Database.EnsureCreatedAsync();
             await CheckRoles();
-            var manager = await CheckUserAsync("1010", "Juan", "Zuluaga", "joseedet@gmail.com", "350 634 2747", "Calle Luna Calle Sol", "Manager");
-            var owner = await CheckUserAsync("2020", "Juan", "Zuluaga", "jeysoftware@yahoo.es", "350 634 2747", "Calle Luna Calle Sol", "Owner");
-            var lessee = await CheckUserAsync("3030", "Juan", "Zuluaga", "jschneiderligero@yahoo.es", "350 634 2747", "Calle Luna Calle Sol", "Lessee");
+            var manager = await CheckUserAsync("1010", "Jose", "Edet", "joseedet@gmail.com", "350 634 2747", "Calle Luna Calle Sol", "Manager");
+            var owner = await CheckUserAsync("2020", "José", "Edet Yake", "jeysoftware@yahoo.es", "350 634 2747", "Calle Luna Calle Sol", "Owner");
+            var lessee = await CheckUserAsync("3030", "José", "Schneider Ligero", "jschneiderligero@yahoo.es", "350 634 2747", "Calle Luna Calle Sol", "Lessee");
             await CheckPropertyTypesAsync();
             await CheckManagerAsync(manager);
             await CheckOwnersAsync(owner);
@@ -75,9 +75,13 @@ namespace MyLeasing.Web.Data
             }
         }
 
-        private async Task<User> CheckUserAsync(string document, string firstName, 
-            string lastName, string email, 
-            string phone, string address, string role)
+        private async Task<User> CheckUserAsync(string document,
+            string firstName, 
+            string lastName,
+            string email, 
+            string phone,
+            string address,
+            string role)
         {
             var user = await _userHelper.GetUserByEmailAsync(email);
             if (user == null)

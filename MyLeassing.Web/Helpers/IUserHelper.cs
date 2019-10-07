@@ -1,8 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using MyLeassing.Web.Data.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace MyLeassing.Web.Helpers

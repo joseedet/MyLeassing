@@ -1,13 +1,10 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using MyLeassing.Web.Data.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace MyLeassing.Web.Helpers
 {
-    public class UserHelper:IUserHelper
+    public class UserHelper : IUserHelper
     {
         private readonly UserManager<User> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
@@ -45,7 +42,7 @@ namespace MyLeassing.Web.Helpers
         public async Task<User> GetUserByEmailAsync(string email)
         {
             return await _userManager.FindByEmailAsync(email);
-           
+
         }
 
         public async Task<bool> IsUserInRoleAsync(User user, string roleName)
@@ -55,4 +52,4 @@ namespace MyLeassing.Web.Helpers
     }
 
 }
-}
+
