@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MyLeassing.Web.Data;
 using MyLeassing.Web.Data.Entities;
+using MyLeassing.Web.Helpers;
+using MyLeassing.Web.Models;
 
 namespace MyLeassing.Web.Controllers
 {
@@ -15,10 +18,19 @@ namespace MyLeassing.Web.Controllers
     public class OwnersController : Controller
     {
         private readonly DataContext _dataContext;
+        private readonly IUserHelper _userHelper;
+        private readonly ICombosHelper _combosHelper;
+        private readonly IConverterHlelper _converterHelper;
 
-        public OwnersController(DataContext datacontext)
+        public OwnersController(
+             DataContext datacontext,
+            IUserHelper userHelper,
+            ICombosHelper combosHelper,IConverterHlelper converterHlelper)
         {
             _dataContext = datacontext;
+            _userHelper = userHelper;
+            _combosHelper = combosHelper;
+            _converterHelper = converterHlelper;
         }
 
         // GET: Owners
@@ -38,17 +50,17 @@ namespace MyLeassing.Web.Controllers
                 return NotFound();
             }
 
-            
-               var owner = await _dataContext.Owners
-                .Include(o => o.User)
-                .Include(o => o.Properties)
-                .ThenInclude(p => p.PropertyType)
-                .Include(o => o.Properties)
-                .ThenInclude(p => p.PropertyImages)
-                .Include(o => o.Contracts)
-                .ThenInclude(c => c.Lessee)
-                .ThenInclude(l => l.User)
-                .FirstOrDefaultAsync(m => m.Id == id);
+
+            var owner = await _dataContext.Owners
+             .Include(o => o.User)
+             .Include(o => o.Properties)
+             .ThenInclude(p => p.PropertyType)
+             .Include(o => o.Properties)
+             .ThenInclude(p => p.PropertyImages)
+             .Include(o => o.Contracts)
+             .ThenInclude(c => c.Lessee)
+             .ThenInclude(l => l.User)
+             .FirstOrDefaultAsync(m => m.Id == id);
 
             if (owner == null)
             {
@@ -69,15 +81,55 @@ namespace MyLeassing.Web.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id")] Owner owner)
+        public async Task<IActionResult> Create(AddUserViewModel model)
         {
             if (ModelState.IsValid)
             {
-                _dataContext.Add(owner);
-                await _dataContext.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                var user = await CreateUserAsync(model);
+                if (user != null)
+                {
+                    var owner = new Owner
+                    {
+
+                        Contracts = new List<Contract>(),
+                        Properties = new List<Property>(),
+                        User = user
+                    };
+
+                    _dataContext.Owners.Add(owner);
+                    await _dataContext.SaveChangesAsync();
+
+                    return RedirectToAction("Index");
+
+                }
+                ModelState.AddModelError(string.Empty, "The user with this email alredy exists!");
             }
-            return View(owner);
+            return View(model);
+        }
+
+        private async Task<User> CreateUserAsync(AddUserViewModel model)
+        {
+            var user = new User
+            {
+                Address = model.Address,
+                Document = model.Document,
+                Email = model.Username,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                PhoneNumber = model.PhoneNumber,
+                UserName = model.Username
+            };
+
+            var result = await _userHelper.AddUserAsync(user, model.Password);
+            if (result != IdentityResult.Success)
+            {
+                return null;
+            }
+
+            var newUser = await _userHelper.GetUserByEmailAsync(model.Username);
+            await _userHelper.AddUserToRoleAsync(newUser, "Owner");
+            return newUser;
+
         }
 
         // GET: Owners/Edit/5
@@ -164,5 +216,53 @@ namespace MyLeassing.Web.Controllers
         {
             return _dataContext.Owners.Any(e => e.Id == id);
         }
+        public async Task<IActionResult> AddProperty(int? id)
+        {
+            if (id == null)
+            {
+
+                return NotFound();
+            }
+            var owner = await _dataContext.Owners.FindAsync(id);
+            if (owner == null)
+            {
+                return NotFound();
+            }
+            var model = new PropertyViewModel
+            {
+                OwnerId = owner.Id,
+                PropertyTypes = _combosHelper.GetComboPropertyTypes()
+
+            };
+            return View(model);
+        }
+        [HttpPost]
+        public async Task<IActionResult> AddProperty(PropertyViewModel model)
+        {
+            if(ModelState.IsValid)
+            {
+                var property = await _converterHelper.ToPropertyAsync(model,true);
+
+                _dataContext.Properties.Add(property);
+                try
+                {
+                    await _dataContext.SaveChangesAsync();
+                    return RedirectToAction($"Details/{model.OwnerId}");
+                }
+                catch(Exception ex)
+                {
+                    ModelState.AddModelError(string.Empty, ex.ToString());
+                }
+
+            }
+            return View(model);
+
+
+        }
+
+       
     }
+
+            
+           
 }

@@ -56,7 +56,8 @@ namespace MyLeassing.Web
             //Se ejecuta una sola vez.
             services.AddTransient<SeedDb>();
             services.AddScoped<IUserHelper, UserHelper>();//Se inyecta cada vez que lo necesita y crea un nuevo objeto.
-
+            services.AddScoped<ICombosHelper, CombosHelper>();
+            services.AddScoped<IConverterHlelper, ConverterHelper>();
 
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
