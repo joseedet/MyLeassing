@@ -12,14 +12,17 @@ namespace MyLeassing.Web.Helpers
     {
        
         private readonly DataContext _dataContext;
-        public ConverterHelper(ICombosHelper combosHelper,DataContext dataContext)
+        private readonly ICombosHelper _combosHelper;
+        public ConverterHelper(ICombosHelper combosHelper
+            ,DataContext dataContext)
         {
-            
             _dataContext = dataContext;
+            _combosHelper = combosHelper;
+            
         }
         public async Task<Property> ToPropertyAsync(PropertyViewModel model, bool isNew)
         {
-            return new PropertyViewModel
+            return new Property
             {
                 Address = model.Address,
                 Contracts=isNew ? new List<Contract>(): model.Contracts,
@@ -39,6 +42,33 @@ namespace MyLeassing.Web.Helpers
                /* OwnerId = model.Owner.Id,               
                 PropertyTypeId = model.PropertyType.Id,
                 PropertyTypes = _combosHelper.GetComboPropertyTypes(),*/
+
+            };
+
+        }
+
+        public PropertyViewModel ToPropertyViewModel(Property property)
+        {
+            return new PropertyViewModel
+            {
+
+                Address=property.Address,                
+                Contracts =property. Contracts,
+                HasParkingLot = property.HasParkingLot,
+                Id =  property.Id,
+                IsAvailable = property.IsAvailable,
+                Neighborhood = property.Neighborhood,
+                Owner = property.Owner,
+                Price = property.Price,
+                PropertyImages =  property.PropertyImages,
+                PropertyType =property.PropertyType,
+                Remarks = property.Remarks,
+                Rooms = property.Rooms,
+                SquareMeters = property.SquareMeters,
+                Stratum = property.Stratum,
+                OwnerId = property.Owner.Id,               
+                PropertyTypeId = property.PropertyType.Id,
+                PropertyTypes = _combosHelper.GetComboPropertyTypes()
 
             };
 
