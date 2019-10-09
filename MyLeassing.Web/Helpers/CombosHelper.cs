@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using MyLeassing.Web.Data;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace MyLeassing.Web.Helpers
 
 
         }
+       
         public IEnumerable<SelectListItem> GetComboPropertyTypes()
         {
 
@@ -35,6 +37,22 @@ namespace MyLeassing.Web.Helpers
 
 
         }
+        public IEnumerable<SelectListItem> GetComboLessees()
+        {
+            var list = _dataContext.Lessees.Include(l => l.User).Select( l=> new SelectListItem
+            {
+                Text = l.User.FullNameWithDocument,
+                Value = $"{l.Id}"
+            }).OrderBy(pt => pt.Text).ToList();
+
+            list.Insert(0, new SelectListItem
+            {
+                Text = "(Select a lessee...)",
+                Value = "0"
+            });
+            return list;
+        }
+        
 
 
     }

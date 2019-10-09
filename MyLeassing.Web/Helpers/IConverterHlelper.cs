@@ -12,5 +12,7 @@ namespace MyLeassing.Web.Helpers
     {
         Task<Property> ToPropertyAsync(PropertyViewModel model, bool isNew);
         PropertyViewModel ToPropertyViewModel(Property property);
+        Task<Contract> ToContractAsync(ContractViewModel model, bool isNew);
+
     }
 }
