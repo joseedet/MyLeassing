@@ -92,5 +92,25 @@ namespace MyLeassing.Web.Helpers
             };
 
         }
+        public ContractViewModel ToContractViewModel(Contract contract)
+        {
+            return new ContractViewModel
+            {
+                EndDate = contract.EndDate.ToLocalTime(),
+                Id = contract.Id,
+                IsActive = contract.IsActive,
+                Lessee=contract.Lessee,
+                LesseeId = contract.Lessee.Id,
+                OwnerId = contract.Owner.Id,
+                Owner =contract.Owner,
+                Property=contract.Property,
+                Price = contract.Price,
+                Remarks = contract.Remarks,
+                StartDate = contract.StartDate.ToLocalTime(),                
+                Lessees = _combosHelper.GetComboLessees(),
+                PropertyId = contract.Property.Id
+            };
+        }
+
     }
 }
