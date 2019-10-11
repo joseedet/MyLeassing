@@ -14,4 +14,8 @@
     <Folder Include="wwwroot\images\Properties\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MyLeassing.Common\MyLeassing.Common.csproj" />
+  </ItemGroup>
+
 </Project>
