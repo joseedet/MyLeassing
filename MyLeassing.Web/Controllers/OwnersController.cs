@@ -308,6 +308,7 @@ namespace MyLeassing.Web.Controllers
                 }
 
             }
+            model.PropertyTypes = _combosHelper.GetComboPropertyTypes();
             return View(model);
 
 
@@ -426,7 +427,7 @@ namespace MyLeassing.Web.Controllers
                 }
 
             }
-
+            model.Lessees = _combosHelper.GetComboLessees();
             return View(model);
         }
         public async Task<IActionResult> EditContract(int? id)
@@ -522,6 +523,7 @@ namespace MyLeassing.Web.Controllers
             if(property.Contracts.Count !=0)
             {
                 ModelState.AddModelError(string.Empty, "The property can't delete!");
+                return RedirectToAction($"{nameof(Details)}/{property.Owner.Id}");
             }
             _dataContext.PropertyImages.RemoveRange(property.PropertyImages);
             // _dataContext.Contracts.RemoveRange(property.Contracts);
