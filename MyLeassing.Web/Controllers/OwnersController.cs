@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using MyLeassing.Web.Data;
 using MyLeassing.Web.Data.Entities;
 using MyLeassing.Web.Helpers;
 using MyLeassing.Web.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MyLeassing.Web.Controllers
 {
@@ -169,7 +168,7 @@ namespace MyLeassing.Web.Controllers
         // POST: Owners/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(EditUserViewModel model)
@@ -204,16 +203,16 @@ namespace MyLeassing.Web.Controllers
 
             var owner = await _dataContext.Owners
                 .Include(o => o.User)
-                .Include(o => o.Properties)                
+                .Include(o => o.Properties)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (owner == null)
             {
                 return NotFound();
             }
-            if(owner.Properties.Count!=0)
+            if (owner.Properties.Count != 0)
             {
                 ModelState.AddModelError(string.Empty, "Owner can't be delete because it has properties.");
-                 return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(Index));
 
             }
             //TODO:Try Catch
@@ -221,13 +220,13 @@ namespace MyLeassing.Web.Controllers
             await _dataContext.SaveChangesAsync();
             await _userHelper.DeleteUserAsync(owner.User.Email);
             return RedirectToAction(nameof(Index));
-        }        
+        }
 
         private bool OwnerExists(int id)
         {
             return _dataContext.Owners.Any(e => e.Id == id);
         }
-       public async Task<IActionResult> EditProperty(int? id)
+        public async Task<IActionResult> EditProperty(int? id)
         {
             if (id == null)
             {
@@ -235,16 +234,16 @@ namespace MyLeassing.Web.Controllers
                 return NotFound();
             }
             var property = await _dataContext.Properties
-                .Include(p=>p.Owner)
-                .Include(p=>p.PropertyType)
-                .FirstOrDefaultAsync(p=> p.Id == id);
-               
+                .Include(p => p.Owner)
+                .Include(p => p.PropertyType)
+                .FirstOrDefaultAsync(p => p.Id == id);
+
             if (property == null)
             {
                 return NotFound();
             }
             var model = _converterHelper.ToPropertyViewModel(property);
-          
+
             return View(model);
         }
         [HttpPost]
@@ -292,9 +291,9 @@ namespace MyLeassing.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> AddProperty(PropertyViewModel model)
         {
-            if(ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                var property = await _converterHelper.ToPropertyAsync(model,true);
+                var property = await _converterHelper.ToPropertyAsync(model, true);
 
                 _dataContext.Properties.Add(property);
                 try
@@ -302,7 +301,7 @@ namespace MyLeassing.Web.Controllers
                     await _dataContext.SaveChangesAsync();
                     return RedirectToAction($"Details/{model.OwnerId}");
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     ModelState.AddModelError(string.Empty, ex.ToString());
                 }
@@ -416,12 +415,12 @@ namespace MyLeassing.Web.Controllers
             {
                 var contract = await _converterHelper.ToContractAsync(model, true);
                 try
-                { 
-                _dataContext.Contracts.Add(contract);
-                await _dataContext.SaveChangesAsync();
-                return RedirectToAction($"{nameof(DetailsProperty)}/{model.PropertyId}");
+                {
+                    _dataContext.Contracts.Add(contract);
+                    await _dataContext.SaveChangesAsync();
+                    return RedirectToAction($"{nameof(DetailsProperty)}/{model.PropertyId}");
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     ModelState.AddModelError(string.Empty, ex.ToString());
                 }
@@ -463,6 +462,29 @@ namespace MyLeassing.Web.Controllers
 
             return View(model);
         }
+        public async Task<IActionResult> DetailsContract(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var contract = await _dataContext.Contracts
+                .Include(c => c.Owner)
+                .ThenInclude(o => o.User)
+                .Include(c => c.Lessee)
+                .ThenInclude(o => o.User)
+                .Include(c => c.Property)
+                .ThenInclude(p => p.PropertyType)
+                .FirstOrDefaultAsync(pi => pi.Id == id.Value);
+            if (contract == null)
+            {
+                return NotFound();
+            }
+
+            return View(contract);
+        }
+
 
         public async Task<IActionResult> DeleteImage(int? id)
         {
@@ -520,7 +542,7 @@ namespace MyLeassing.Web.Controllers
             {
                 return NotFound();
             }
-            if(property.Contracts.Count !=0)
+            if (property.Contracts.Count != 0)
             {
                 ModelState.AddModelError(string.Empty, "The property can't delete!");
                 return RedirectToAction($"{nameof(Details)}/{property.Owner.Id}");
